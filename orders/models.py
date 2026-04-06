@@ -34,7 +34,13 @@ class Order(models.Model):
     order_number = models.CharField(max_length=50, unique=True, editable=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='pending')
-    payment_method = models.CharField(max_length=50, blank=True)
+    PAYMENT_METHODS = [
+        ('cash_on_delivery', 'Cash on Delivery'),
+        ('credit_card', 'Credit Card'),
+        ('debit_card', 'Debit Card'),
+    ]
+
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHODS, default='cash_on_delivery')
     
     # Pricing
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
