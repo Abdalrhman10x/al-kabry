@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block title %}Algorithm Comparison - AlKabry Ecommerce{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
+        <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <svg class="w-8 h-8 text-amazon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+            </svg>
+            Detailed Algorithm Comparison
+        </h1>
+        <a href="{% url 'analytics:generate_report' %}" 
+           class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Generate Report
+        </a>
+    </div>
+
+    {% if evaluations %}
+    <!-- Winner Announcement -->
+    {% if winner %}
+    <div class="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 rounded-lg p-6 mb-8 text-center">
+        <div class="inline-flex items-center gap-3 mb-3">
+            <svg class="w-12 h-12 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <h2 class="text-2xl font-bold text-green-800">
+                Winner: {% if winner == 'hybrid' %}Hybrid{% elif winner == 'content_based' %}Content-Based{% elif winner == 'user_based_cf' %}User-Based CF{% elif winner == 'item_based_cf' %}Item-Based CF{% elif winner == 'svd' %}SVD{% else %}{{ winner }}{% endif %}
+            </h2>
+        </div>
+        <p class="text-green-700">Based on comprehensive evaluation metrics including precision, recall, NDCG, diversity, and coverage</p>
+    </div>
+    {% endif %}
+
+    <!-- Evaluation Metrics Table -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Evaluation Metrics</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-900 text-white">
+                        <th class="text-left py-3 px-4 text-sm font-bold">Algorithm</th>
+                        <th class="text-center py-3 px-4 text-sm font-bold">Precision@10</th>
+                        <th class="text-center py-3 px-4 text-sm font-bold">Recall@10</th>
+                        <th class="text-center py-3 px-4 text-sm font-bold">F1-Score</th>
+                        <th class="text-center py-3 px-4 text-sm font-bold">NDCG@10</th>
+                        <th class="text-center py-3 px-4 text-sm font-bold">Diversity</th>
+                        <th class="text-center py-3 px-4 text-sm font-bold">Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for algo, metrics in evaluations.items %}
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 {% if algo == winner %}bg-green-50{% endif %}">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2">
+                                {% if algo == 'content_based' %}
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
+                                <span class="font-semibold">Content-Based</span>
+                                {% elif algo == 'user_based_cf' %}
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span class="font-semibold">User-Based CF</span>
+                                {% elif algo == 'item_based_cf' %}
+                                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                                <span class="font-semibold">Item-Based CF</span>
+                                {% elif algo == 'svd' %}
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                                </svg>
+                                <span class="font-semibold">SVD</span>
+                                {% elif algo == 'hybrid' %}
+                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                <span class="font-semibold">Hybrid</span>
+                                {% endif %}
+                                {% if algo == winner %}
+                                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="text-center py-3 px-4">
+                            <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">{{ metrics.precision|floatformat:4 }}</span>
+                        </td>
+                        <td class="text-center py-3 px-4">
+                            <span class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">{{ metrics.recall|floatformat:4 }}</span>
+                        </td>
+                        <td class="text-center py-3 px-4 font-semibold">{{ metrics.f1_score|floatformat:4 }}</td>
+                        <td class="text-center py-3 px-4">
+                            <span class="bg-purple-100 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">{{ metrics.ndcg|floatformat:4 }}</span>
+                        </td>
+                        <td class="text-center py-3 px-4">
+                            <span class="bg-orange-100 text-orange-800 text-sm font-semibold px-3 py-1 rounded-full">{{ metrics.diversity|floatformat:4 }}</span>
+                        </td>
+                        <td class="text-center py-3 px-4">
+                            <span class="bg-gray-100 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">{{ metrics.coverage|floatformat:4 }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Precision & Recall Chart -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Precision & Recall Comparison</h3>
+            <canvas id="precisionRecallChart"></canvas>
+        </div>
+
+        <!-- NDCG & Diversity Chart -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">NDCG & Diversity</h3>
+            <canvas id="ndcgChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Overall Scores -->
+    {% if scores %}
+    <div class="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Overall Algorithm Scores</h3>
+        <div class="grid grid-cols-5 gap-4">
+            {% for algo, score in scores.items %}
+            <div class="text-center p-6 {% if algo == winner %}bg-gradient-to-br from-green-500 to-green-600 text-white{% else %}bg-gray-50{% endif %} rounded-lg">
+                <h4 class="text-3xl font-bold mb-2">{{ score|floatformat:3 }}</h4>
+                <p class="text-sm {% if algo == winner %}text-green-50{% else %}text-gray-600{% endif %}">
+                    {% if algo == 'content_based' %}
+                    Content-Based
+                    {% elif algo == 'user_based_cf' %}
+                    User-Based CF
+                    {% elif algo == 'item_based_cf' %}
+                    Item-Based CF
+                    {% elif algo == 'svd' %}
+                    SVD
+                    {% elif algo == 'hybrid' %}
+                    Hybrid
+                    {% endif %}
+                </p>
+                {% if algo == winner %}
+                <svg class="w-6 h-6 mx-auto mt-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-white border border-gray-200 rounded-lg text-center py-16">
+        <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Not Enough Data</h3>
+        <p class="text-gray-500 mb-6">More user interactions are needed to evaluate the algorithms.</p>
+        <a href="{% url 'products:list' %}" 
+           class="bg-amazon-yellow hover:bg-amazon-yellow/90 text-gray-900 font-bold py-3 px-8 rounded-full transition-colors inline-block">
+            Start Shopping & Generate Data
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if evaluations %}
+<script>
+const labels = [{% for key in evaluations.keys %}'{{ key }}'{% if not forloop.last %}, {% endif %}{% endfor %}].map(label => {
+    const names = {
+        'content_based': 'Content-Based',
+        'user_based_cf': 'User-Based CF',
+        'item_based_cf': 'Item-Based CF',
+        'svd': 'SVD',
+        'hybrid': 'Hybrid'
+    };
+    return names[label] || label;
+});
+
+const evalData = {{ evaluations|safe }};
+
+// Precision & Recall Chart
+new Chart(document.getElementById('precisionRecallChart'), {
+    type: 'radar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Precision',
+                data: Object.values(evalData).map(m => m.precision),
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(59, 130, 246, 1)'
+            },
+            {
+                label: 'Recall',
+                data: Object.values(evalData).map(m => m.recall),
+                backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                borderColor: 'rgba(34, 197, 94, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(34, 197, 94, 1)'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        },
+        scales: {
+            r: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 0.1
+                }
+            }
+        }
+    }
+});
+
+// NDCG Chart
+new Chart(document.getElementById('ndcgChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'NDCG',
+                data: Object.values(evalData).map(m => m.ndcg),
+                backgroundColor: 'rgba(168, 85, 247, 0.7)',
+                borderColor: 'rgba(168, 85, 247, 1)',
+                borderWidth: 1,
+                borderRadius: 6
+            },
+            {
+                label: 'Diversity',
+                data: Object.values(evalData).map(m => m.diversity),
+                backgroundColor: 'rgba(251, 191, 36, 0.7)',
+                borderColor: 'rgba(251, 191, 36, 1)',
+                borderWidth: 1,
+                borderRadius: 6
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}
