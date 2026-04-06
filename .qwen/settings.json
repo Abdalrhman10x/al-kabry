@@ -24,7 +24,8 @@
       "Bash(jupyter *)",
       "Bash(~/anaconda3/bin/pip *)",
       "Bash(~/anaconda3/bin/python *)",
-      "Bash(ls *)"
+      "Bash(ls *)",
+      "Bash(cp *)"
     ]
   },
   "$version": 3
